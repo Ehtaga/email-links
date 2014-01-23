@@ -1,2 +1,0 @@
-classpath*:common/types/CommonTS.xml
-classpath*:my/types/MailTS.xml
