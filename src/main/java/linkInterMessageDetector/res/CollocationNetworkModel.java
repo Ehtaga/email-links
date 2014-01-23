@@ -1,5 +1,6 @@
 package linkInterMessageDetector.res;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,5 +16,7 @@ public interface CollocationNetworkModel {
 	
 	public void echo();
 	
-	public void save(String filename);
+	public void save(String filename) throws IOException;
+	
+	public Integer getSize();
 }

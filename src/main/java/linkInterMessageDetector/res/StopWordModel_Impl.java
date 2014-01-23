@@ -35,8 +35,8 @@ public final class StopWordModel_Impl implements StopWordModel, SharedResourceOb
 	
 	/***/
 	public synchronized void load(DataResource aData) throws ResourceInitializationException {
-		System.out.println(getClass().getSimpleName()+": load +1");
-
+		System.out.println(getClass().getSimpleName()+": Start loading stopwords resource");
+		System.out.println(aData.getUri());
 		if (stopWordSet == null) {		
 			stopWordSet = new HashSet<String>();
 			InputStream inStr = null;
@@ -47,6 +47,7 @@ public final class StopWordModel_Impl implements StopWordModel, SharedResourceOb
 				BufferedReader reader = new BufferedReader(new InputStreamReader(inStr));
 				String line;
 				while ((line = reader.readLine()) != null) {
+					//System.out.println(line);
 					if (! line.startsWith("#"))
 					add(line.trim());
 				}
@@ -62,5 +63,6 @@ public final class StopWordModel_Impl implements StopWordModel, SharedResourceOb
 			}
 
 		}
+		System.out.println(getClass().getSimpleName()+": End loading stopwords resource");
 	}
 }

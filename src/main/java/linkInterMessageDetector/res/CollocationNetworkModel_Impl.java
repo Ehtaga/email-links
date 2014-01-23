@@ -30,6 +30,7 @@ public final class CollocationNetworkModel_Impl implements CollocationNetworkMod
 	}
 	
 	public synchronized Double getCollocationScore(String word1, String word2) {
+		//System.out.println("word1: "+word1+" , word2: "+word2);
 		if (!getCollocationNetwork().containsKey(word1)) {
 			Map<String,Double> word1Map = new HashMap<String,Double>();
 			getCollocationNetwork().put(word1, word1Map);
@@ -49,8 +50,8 @@ public final class CollocationNetworkModel_Impl implements CollocationNetworkMod
 	}
 
 	public void load(DataResource aData) throws ResourceInitializationException {
-		System.out.println(getClass().getSimpleName()+": load +1");
-		System.out.println(aData);
+		System.out.println(getClass().getSimpleName()+": Start loading CN resource");
+		System.out.println(aData.getUri());
 		if (collocationNetworkMap == null) {
 			collocationNetworkMap = new HashMap<String,Map<String,Double>>();
 			InputStream inStr = null;
@@ -58,7 +59,15 @@ public final class CollocationNetworkModel_Impl implements CollocationNetworkMod
 				// open input stream to data
 				inStr = aData.getInputStream();
 				// read each line
-				BufferedReader reader = new BufferedReader(new InputStreamReader(inStr));
+			}
+			catch (NullPointerException e) {
+				System.out.println("Nothing to load");
+				return;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(inStr))) {
 				String line;
 				while ((line = reader.readLine()) != null) {
 					if(line.length() > 0) {
@@ -72,6 +81,7 @@ public final class CollocationNetworkModel_Impl implements CollocationNetworkMod
 						if (!getWord1Map(word1).containsKey(word2)) {
 							getWord1Map(word1).put(word2,score);
 						}
+						//System.out.println("word1: "+word1+", word2: "+word2+" --> "+getCollocationScore(word1, word2));
 					}
 				}
 			} catch (IOException e) {
@@ -85,6 +95,8 @@ public final class CollocationNetworkModel_Impl implements CollocationNetworkMod
 				}
 			}
 		}
+		System.out.println("Size after loading: "+getSize());
+		System.out.println(getClass().getSimpleName()+": End loading CN resource");
 	}
 
 	public void echo() {
@@ -96,16 +108,24 @@ public final class CollocationNetworkModel_Impl implements CollocationNetworkMod
 		}	
 	}
 	
-	public synchronized void save(String filename) {
-		String s = "";
-		for (String word1 : keySet()) {
-			Map<String,Double> collocations = getWord1Map(word1);
-			for (String word2 : collocations.keySet()) {
-				s += word1+"\t"+word2+"\t"+getCollocationScore(word1,word2)+"\n";
-			}
-		}
-		MiscUtil.writeToFS(s,filename);
+	public synchronized void save(String filename) throws IOException {
+		MiscUtil.writeToFS(toString(),filename);
 	}
 
-	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for (String word : collocationNetworkMap.keySet()) {
+			for (String collocation : collocationNetworkMap.get(word).keySet()) {
+				if (collocationNetworkMap.get(word).get(collocation) > 1.0)
+					sb.append(word).append('\t').append(collocation).append('\t').append(collocationNetworkMap.get(word).get(collocation)).append('\n');
+			}
+		}
+		return sb.toString();
+	}
+
+	@Override
+	public Integer getSize() {
+		return collocationNetworkMap.size();
+	}
 }

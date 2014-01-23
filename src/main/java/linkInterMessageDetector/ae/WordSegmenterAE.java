@@ -21,7 +21,7 @@ import common.types.Token;
  * in a stop word set
  */
 public class WordSegmenterAE extends JCasAnnotator_ImplBase {
-	final static String WORD_SEPARATOR_PATTERN = "[^\\s\\p{Punct}\\d]+"; //"[^\\s\\.:,'\\(\\)!]+";
+	final static String WORD_SEPARATOR_PATTERN = "[^\\s\\p{Punct}]+"; //"[^\\s\\.:,'\\(\\)!]+";
 
 	// TODO add http://www.w3.org/TR/html-markup/elements.html
 	public final static String RES_KEY = "aKey";
@@ -32,13 +32,16 @@ public class WordSegmenterAE extends JCasAnnotator_ImplBase {
 	public void process(JCas aJCas) throws AnalysisEngineProcessException {
 		// Prints the instance ID to the console - this proves the same instance
 		// of the SharedModel is used in both Annotator instances.
-		System.out.println(getClass().getSimpleName() + ": " + stopWords);
-
+		//System.out.println(getClass().getSimpleName()+": Start process WordSegmenter");
+		//System.out.println(getClass().getSimpleName() + ": " + stopWords);
+		
 		Pattern wordSeparatorPattern = Pattern.compile(WORD_SEPARATOR_PATTERN);
 		Matcher matcher = wordSeparatorPattern.matcher(aJCas.getDocumentText());
 		while (matcher.find()) {
-			if (!stopWords.contains(matcher.group().toLowerCase()))
+			String match = matcher.group().toLowerCase();
+			if (!stopWords.contains(match) && match.length() > 1 && !match.matches(".*[0-9].*"))
 				new Token(aJCas, matcher.start(), matcher.end()).addToIndexes(); 
 		}
+		//System.out.println(getClass().getSimpleName()+": End process WordSegmenter");
 	}
 }

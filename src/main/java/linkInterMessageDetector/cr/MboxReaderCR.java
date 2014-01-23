@@ -124,6 +124,9 @@ public class MboxReaderCR extends JCasCollectionReader_ImplBase
 		srcDocInfo.setLastSegment(false); // TODO cannot know when the last segment is encountered with an iterator
 		srcDocInfo.addToIndexes();
 		messageIndex++;
+		if (messageIndex % 50 == 0) {
+			System.out.println("# messages : "+messageIndex);
+		}
 	}
 
 
